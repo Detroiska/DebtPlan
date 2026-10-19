@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { DEBT_TYPES } from '../../utils/debts.js'
+import { validateDebtForm, hasErrors } from '../../utils/validation.js'
 
 const EMPTY_VALUES = Object.freeze({
   type: 'credit',
@@ -12,6 +13,12 @@ const EMPTY_VALUES = Object.freeze({
 const GENERIC_ERROR =
   'Проверьте введённые данные: остаток, ставка и минимальный платёж должны быть корректными.'
 
+const INVALID_FIELD_IDS = {
+  balance: 'debt-balance',
+  apr: 'debt-apr',
+  minPayment: 'debt-min-payment',
+}
+
 export default function DebtForm({
   isOpen,
   title = 'Добавление долга',
@@ -21,6 +28,7 @@ export default function DebtForm({
   onSubmit,
 }) {
   const [values, setValues] = useState(EMPTY_VALUES)
+  const [errors, setErrors] = useState({})
   const [error, setError] = useState('')
   const firstFieldRef = useRef(null)
   const initialValuesRef = useRef(initialValues)
@@ -30,6 +38,7 @@ export default function DebtForm({
   useEffect(() => {
     if (!isOpen) return
     setValues(initialValuesRef.current ?? EMPTY_VALUES)
+    setErrors({})
     setError('')
 
     const frame = requestAnimationFrame(() => {
@@ -66,6 +75,13 @@ export default function DebtForm({
   const handleChange = (event) => {
     const { name, value } = event.target
     setValues((prev) => ({ ...prev, [name]: value }))
+
+    setErrors((prev) => {
+      if (!(name in prev)) return prev
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
   }
 
   const handleOverlayMouseDown = (event) => {
@@ -74,6 +90,17 @@ export default function DebtForm({
 
   const handleSubmit = (event) => {
     event.preventDefault()
+
+    const fieldErrors = validateDebtForm(values)
+    if (hasErrors(fieldErrors)) {
+      setErrors(fieldErrors)
+
+      const firstInvalid = Object.keys(INVALID_FIELD_IDS).find((key) => key in fieldErrors)
+      if (firstInvalid) {
+        document.getElementById(INVALID_FIELD_IDS[firstInvalid])?.focus()
+      }
+      return
+    }
 
     const result = onSubmit({
       type: values.type,
@@ -101,7 +128,7 @@ export default function DebtForm({
           {title}
         </h3>
 
-        <form className="form" onSubmit={handleSubmit}>
+        <form className="form" noValidate onSubmit={handleSubmit}>
           <div className="form-field">
             <label className="form-label" htmlFor="debt-type">
               Тип продукта
@@ -144,7 +171,7 @@ export default function DebtForm({
               Остаток долга, ₽
             </label>
             <input
-              className="form-input"
+              className={`form-input${errors.balance ? ' form-input--invalid' : ''}`}
               id="debt-balance"
               name="balance"
               type="number"
@@ -152,9 +179,16 @@ export default function DebtForm({
               step="0.01"
               inputMode="decimal"
               required
+              aria-invalid={errors.balance ? 'true' : undefined}
+              aria-describedby={errors.balance ? 'debt-balance-error' : undefined}
               value={values.balance}
               onChange={handleChange}
             />
+            {errors.balance ? (
+              <p className="form-field-error" id="debt-balance-error" role="alert">
+                {errors.balance}
+              </p>
+            ) : null}
           </div>
 
           <div className="form-field">
@@ -162,7 +196,7 @@ export default function DebtForm({
               Годовая ставка, %
             </label>
             <input
-              className="form-input"
+              className={`form-input${errors.apr ? ' form-input--invalid' : ''}`}
               id="debt-apr"
               name="apr"
               type="number"
@@ -171,13 +205,19 @@ export default function DebtForm({
               step="0.1"
               inputMode="decimal"
               required
-              aria-describedby="debt-apr-hint"
+              aria-invalid={errors.apr ? 'true' : undefined}
+              aria-describedby={errors.apr ? 'debt-apr-hint debt-apr-error' : 'debt-apr-hint'}
               value={values.apr}
               onChange={handleChange}
             />
             <small className="form-hint" id="debt-apr-hint">
               Вводите ставку из договора, не ПСК.
             </small>
+            {errors.apr ? (
+              <p className="form-field-error" id="debt-apr-error" role="alert">
+                {errors.apr}
+              </p>
+            ) : null}
           </div>
 
           <div className="form-field">
@@ -185,7 +225,7 @@ export default function DebtForm({
               Минимальный платёж, ₽
             </label>
             <input
-              className="form-input"
+              className={`form-input${errors.minPayment ? ' form-input--invalid' : ''}`}
               id="debt-min-payment"
               name="minPayment"
               type="number"
@@ -193,9 +233,16 @@ export default function DebtForm({
               step="0.01"
               inputMode="decimal"
               required
+              aria-invalid={errors.minPayment ? 'true' : undefined}
+              aria-describedby={errors.minPayment ? 'debt-min-payment-error' : undefined}
               value={values.minPayment}
               onChange={handleChange}
             />
+            {errors.minPayment ? (
+              <p className="form-field-error" id="debt-min-payment-error" role="alert">
+                {errors.minPayment}
+              </p>
+            ) : null}
           </div>
 
           {error ? (

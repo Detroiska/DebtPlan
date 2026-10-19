@@ -266,6 +266,16 @@
   color: var(--color-text-muted);
 }
 
+.form-input--invalid {
+  border-color: #d64545;
+  background-color: #fdf5f5;
+}
+
+.form-field-error {
+  font-size: 0.8125rem;
+  color: #b42318;
+}
+
 .form-error {
   margin-top: 12px;
   padding: 10px 12px;
