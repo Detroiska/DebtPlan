@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DEBT_TYPES } from '../../utils/debts.js'
 import { validateDebtForm, hasErrors } from '../../utils/validation.js'
+import { useModalDialog } from '../../hooks/useModalDialog.js'
 
 const EMPTY_VALUES = Object.freeze({
   type: 'credit',
@@ -35,6 +36,8 @@ export default function DebtForm({
 
   initialValuesRef.current = initialValues
 
+  useModalDialog(isOpen, onClose)
+
   useEffect(() => {
     if (!isOpen) return
     setValues(initialValuesRef.current ?? EMPTY_VALUES)
@@ -46,28 +49,6 @@ export default function DebtForm({
     })
 
     return () => cancelAnimationFrame(frame)
-  }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) return
-
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape') onClose()
-    }
-
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [isOpen, onClose])
-
-  useEffect(() => {
-    if (!isOpen) return
-
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousOverflow
-    }
   }, [isOpen])
 
   if (!isOpen) return null

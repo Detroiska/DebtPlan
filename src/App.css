@@ -201,6 +201,32 @@
   font-size: 0.8125rem;
 }
 
+.btn--danger {
+  background-color: transparent;
+  border-color: #e3c0bd;
+  color: #b42318;
+}
+
+.btn--danger:hover {
+  background-color: #fdf3f2;
+  border-color: #b42318;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal--confirm {
+  max-width: 420px;
+}
+
+.modal__message {
+  margin-top: 8px;
+  color: var(--color-text-muted);
+}
+
 .btn:focus-visible,
 .form-input:focus-visible {
   outline: 2px solid var(--color-accent);

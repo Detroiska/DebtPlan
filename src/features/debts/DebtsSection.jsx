@@ -1,12 +1,14 @@
 import { useCallback, useState } from 'react'
 import Section from '../../components/Section.jsx'
+import ConfirmDialog from '../../components/ConfirmDialog.jsx'
 import DebtForm from './DebtForm.jsx'
 import DebtsTable from './DebtsTable.jsx'
-import { debtToFormValues } from '../../utils/debts.js'
+import { debtToFormValues, getDebtLabel } from '../../utils/debts.js'
 
-export default function DebtsSection({ debts, onAddDebt, onEditDebt }) {
+export default function DebtsSection({ debts, onAddDebt, onEditDebt, onDeleteDebt }) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingDebt, setEditingDebt] = useState(null)
+  const [pendingDelete, setPendingDelete] = useState(null)
 
   const closeForm = useCallback(() => {
     setIsFormOpen(false)
@@ -22,6 +24,16 @@ export default function DebtsSection({ debts, onAddDebt, onEditDebt }) {
     setEditingDebt(debt)
     setIsFormOpen(true)
   }, [])
+
+  const confirmDelete = useCallback((debt) => setPendingDelete(debt), [])
+  const cancelDelete = useCallback(() => setPendingDelete(null), [])
+
+  const handleConfirmDelete = useCallback(() => {
+    if (pendingDelete) {
+      onDeleteDebt(pendingDelete.id)
+      setPendingDelete(null)
+    }
+  }, [pendingDelete, onDeleteDebt])
 
   const handleSubmit = useCallback(
     (input) => {
@@ -63,7 +75,7 @@ export default function DebtsSection({ debts, onAddDebt, onEditDebt }) {
           </span>
         </p>
       ) : (
-        <DebtsTable debts={debts} onEditDebt={openEditForm} />
+        <DebtsTable debts={debts} onEditDebt={openEditForm} onDeleteDebt={confirmDelete} />
       )}
 
       <DebtForm
@@ -73,6 +85,19 @@ export default function DebtsSection({ debts, onAddDebt, onEditDebt }) {
         initialValues={formValues}
         onClose={closeForm}
         onSubmit={handleSubmit}
+      />
+
+      <ConfirmDialog
+        isOpen={pendingDelete !== null}
+        title="Удаление долга"
+        confirmLabel="Удалить"
+        message={
+          pendingDelete
+            ? `Удалить долг «${getDebtLabel(pendingDelete)}» из списка? Отменить это действие будет нельзя.`
+            : ''
+        }
+        onConfirm={handleConfirmDelete}
+        onCancel={cancelDelete}
       />
     </Section>
   )

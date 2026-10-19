@@ -1,7 +1,7 @@
 import { formatMoney, formatPercent } from '../../utils/format.js'
 import { getDebtLabel, getDebtTypeLabel } from '../../utils/debts.js'
 
-export default function DebtsTable({ debts, onEditDebt }) {
+export default function DebtsTable({ debts, onEditDebt, onDeleteDebt }) {
   const totalBalance = debts.reduce((sum, debt) => sum + debt.balance, 0)
   const totalMinPayment = debts.reduce((sum, debt) => sum + debt.minPayment, 0)
 
@@ -40,13 +40,22 @@ export default function DebtsTable({ debts, onEditDebt }) {
                 {formatMoney(debt.minPayment)}
               </td>
               <td data-label="Действия">
-                <button
-                  type="button"
-                  className="btn btn--secondary btn--small"
-                  onClick={() => onEditDebt(debt)}
-                >
-                  Изменить
-                </button>
+                <div className="table-actions">
+                  <button
+                    type="button"
+                    className="btn btn--secondary btn--small"
+                    onClick={() => onEditDebt(debt)}
+                  >
+                    Изменить
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--danger btn--small"
+                    onClick={() => onDeleteDebt(debt)}
+                  >
+                    Удалить
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
