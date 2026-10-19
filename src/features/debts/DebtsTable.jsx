@@ -65,9 +65,13 @@ export default function DebtsTable({ debts, onEditDebt, onDeleteDebt }) {
             <th scope="row" colSpan={2}>
               Итого
             </th>
-            <td className="num">{formatMoney(totalBalance)}</td>
-            <td className="num" aria-hidden="true"></td>
-            <td className="num">{formatMoney(totalMinPayment)}</td>
+            <td className="num" data-label="Итого остаток">
+              {formatMoney(totalBalance)}
+            </td>
+            <td aria-hidden="true"></td>
+            <td className="num" data-label="Итого мин. платежей">
+              {formatMoney(totalMinPayment)}
+            </td>
             <td aria-hidden="true"></td>
           </tr>
         </tfoot>
