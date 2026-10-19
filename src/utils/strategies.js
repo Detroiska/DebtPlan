@@ -114,3 +114,12 @@ export function calculateStrategies(debts, params, customOrder = null) {
 
   return results
 }
+
+export function pickSelectedStrategy(strategies, selectedType) {
+  if (!Array.isArray(strategies) || strategies.length === 0) return null
+
+  const found = strategies.find((strategy) => strategy && strategy.type === selectedType)
+  if (found) return found
+
+  return pickOptimalStrategy(strategies) ?? strategies[0]
+}

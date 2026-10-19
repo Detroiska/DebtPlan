@@ -1,7 +1,9 @@
+import { useMemo, useState } from 'react'
 import AppFooter from './components/AppFooter.jsx'
 import AppHeader from './components/AppHeader.jsx'
 import { useCalcParams } from './hooks/useCalcParams.js'
 import { useDebts } from './hooks/useDebts.js'
+import { calculateStrategies, pickSelectedStrategy } from './utils/strategies.js'
 import CalcParamsSection from './features/calc/CalcParamsSection.jsx'
 import DebtsSection from './features/debts/DebtsSection.jsx'
 import MethodologySection from './features/methodology/MethodologySection.jsx'
@@ -11,6 +13,10 @@ import './App.css'
 export default function App() {
   const { debts, addDebt, updateDebt, removeDebt } = useDebts()
   const { params, setParam } = useCalcParams()
+
+  const strategies = useMemo(() => calculateStrategies(debts, params), [debts, params])
+  const [selectedStrategyType, setSelectedStrategyType] = useState(null)
+  const selectedStrategy = pickSelectedStrategy(strategies, selectedStrategyType)
 
   return (
     <div className="app">
@@ -25,7 +31,11 @@ export default function App() {
             onDeleteDebt={removeDebt}
           />
           <CalcParamsSection debts={debts} params={params} onChange={setParam} />
-          <ResultsSection />
+          <ResultsSection
+            strategies={strategies}
+            selectedStrategy={selectedStrategy}
+            onSelectType={setSelectedStrategyType}
+          />
           <MethodologySection />
         </div>
       </main>
