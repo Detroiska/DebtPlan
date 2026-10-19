@@ -3,7 +3,7 @@ import Section from '../../components/Section.jsx'
 import { buildClosureList } from '../../utils/payoff.js'
 import { formatDate, formatMoney, formatMonth, formatMonths } from '../../utils/format.js'
 
-export default function ResultsSection({ debts = [], strategies = [], selectedStrategy = null, onSelectType }) {
+export default function ResultsSection({ debts = [], strategies = [], selectedStrategy = null, isRecalculating = false, onSelectType }) {
   const [scheduleOpen, setScheduleOpen] = useState(false)
 
   useEffect(() => {
@@ -24,6 +24,11 @@ export default function ResultsSection({ debts = [], strategies = [], selectedSt
       id="results"
       title="Результаты"
       description="Сравнение стратегий погашения: срок, дата полного погашения и переплата."
+      actions={
+        isRecalculating ? (
+          <span className="recalc-indicator" role="status">Пересчёт…</span>
+        ) : null
+      }
     >
       {hasCards ? (
         <>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import AppFooter from './components/AppFooter.jsx'
 import AppHeader from './components/AppHeader.jsx'
 import { useCalcParams } from './hooks/useCalcParams.js'
@@ -14,7 +14,15 @@ export default function App() {
   const { debts, addDebt, updateDebt, removeDebt } = useDebts()
   const { params, setParam } = useCalcParams()
 
-  const strategies = useMemo(() => calculateStrategies(debts, params), [debts, params])
+  const deferredDebts = useDeferredValue(debts)
+  const deferredParams = useDeferredValue(params)
+
+  const strategies = useMemo(
+    () => calculateStrategies(deferredDebts, deferredParams),
+    [deferredDebts, deferredParams],
+  )
+  const isRecalculating = deferredDebts !== debts || deferredParams !== params
+
   const [selectedStrategyType, setSelectedStrategyType] = useState(null)
   const selectedStrategy = pickSelectedStrategy(strategies, selectedStrategyType)
 
@@ -32,9 +40,10 @@ export default function App() {
           />
           <CalcParamsSection debts={debts} params={params} onChange={setParam} />
           <ResultsSection
-            debts={debts}
+            debts={deferredDebts}
             strategies={strategies}
             selectedStrategy={selectedStrategy}
+            isRecalculating={isRecalculating}
             onSelectType={setSelectedStrategyType}
           />
           <MethodologySection />
