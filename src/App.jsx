@@ -32,6 +32,7 @@ export default function App() {
           />
           <CalcParamsSection debts={debts} params={params} onChange={setParam} />
           <ResultsSection
+            debts={debts}
             strategies={strategies}
             selectedStrategy={selectedStrategy}
             onSelectType={setSelectedStrategyType}

@@ -207,4 +207,37 @@ export function calculatePayoff(debts, params, order, options = {}) {
   }
 }
 
+export function buildClosureList(debts, result) {
+  if (!result || result.isEmpty) return []
+
+  const byId = new Map(normalizeDebtList(debts).map((debt) => [debt.id, debt]))
+  const closedIds = Array.isArray(result.closedOrder) ? result.closedOrder : []
+  if (closedIds.length === 0) return []
+
+  const closedMonthIso = new Map()
+  const schedule = Array.isArray(result.schedule) ? result.schedule : []
+  for (const entry of schedule) {
+    if (!entry || !Array.isArray(entry.rows)) continue
+    for (const row of entry.rows) {
+      if (row && row.endBalance <= 0 && !closedMonthIso.has(row.debtId)) {
+        closedMonthIso.set(row.debtId, entry.monthIso)
+      }
+    }
+  }
+
+  const closure = []
+  for (const id of closedIds) {
+    const debt = byId.get(id)
+    if (!debt) continue
+    closure.push({
+      id,
+      name: debt.name,
+      type: debt.type,
+      closedAtIso: closedMonthIso.get(id) ?? null,
+    })
+  }
+
+  return closure
+}
+
 export { MAX_MONTHS as PAYOFF_MAX_MONTHS }
