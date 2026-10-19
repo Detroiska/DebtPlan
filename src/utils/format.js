@@ -17,6 +17,14 @@ export function formatPercent(value) {
   return `${parsed.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} %`
 }
 
+export function todayIso() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function formatDate(isoDate) {
   if (typeof isoDate !== 'string' || isoDate === '') return '—'
   const date = new Date(`${isoDate}T00:00:00`)

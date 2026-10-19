@@ -1,5 +1,6 @@
 import AppFooter from './components/AppFooter.jsx'
 import AppHeader from './components/AppHeader.jsx'
+import { useCalcParams } from './hooks/useCalcParams.js'
 import { useDebts } from './hooks/useDebts.js'
 import CalcParamsSection from './features/calc/CalcParamsSection.jsx'
 import DebtsSection from './features/debts/DebtsSection.jsx'
@@ -9,6 +10,7 @@ import './App.css'
 
 export default function App() {
   const { debts, addDebt, updateDebt, removeDebt } = useDebts()
+  const { params, setParam } = useCalcParams()
 
   return (
     <div className="app">
@@ -22,7 +24,7 @@ export default function App() {
             onEditDebt={updateDebt}
             onDeleteDebt={removeDebt}
           />
-          <CalcParamsSection />
+          <CalcParamsSection params={params} onChange={setParam} />
           <ResultsSection />
           <MethodologySection />
         </div>
