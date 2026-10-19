@@ -24,7 +24,7 @@ export default function App() {
             onEditDebt={updateDebt}
             onDeleteDebt={removeDebt}
           />
-          <CalcParamsSection params={params} onChange={setParam} />
+          <CalcParamsSection debts={debts} params={params} onChange={setParam} />
           <ResultsSection />
           <MethodologySection />
         </div>

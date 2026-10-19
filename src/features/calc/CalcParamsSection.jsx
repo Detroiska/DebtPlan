@@ -1,9 +1,11 @@
 import Section from '../../components/Section.jsx'
-import { todayIso } from '../../utils/format.js'
+import { todayIso, formatMoney } from '../../utils/format.js'
 import { parseNumber } from '../../utils/debts.js'
+import { getFreeAmountWarning } from '../../utils/validation.js'
 
-export default function CalcParamsSection({ params, onChange }) {
+export default function CalcParamsSection({ debts, params, onChange }) {
   const startDate = params.startDate ?? todayIso()
+  const warning = getFreeAmountWarning(debts, params.freeAmount)
 
   const handleFreeAmount = (event) => {
     onChange('freeAmount', parseNumber(event.target.value) ?? 0)
@@ -89,6 +91,15 @@ export default function CalcParamsSection({ params, onChange }) {
           />
           <small className="form-hint">Первый месяц, для которого считаем план. По умолчанию — сегодня.</small>
         </div>
+
+        {warning ? (
+          <p className="form-warning" role="alert">
+            <strong>Свободной суммы не хватает.</strong> Минимальные платежи по всем долгам
+            составляют {formatMoney(warning.minTotal)} в месяц, а указано{' '}
+            {formatMoney(warning.freeAmount)}. План получится неполным — увеличьте сумму хотя бы
+            до {formatMoney(warning.minTotal)}.
+          </p>
+        ) : null}
       </form>
     </Section>
   )
