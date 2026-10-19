@@ -1,13 +1,23 @@
+import { useEffect, useState } from 'react'
 import Section from '../../components/Section.jsx'
 import { buildClosureList } from '../../utils/payoff.js'
-import { formatDate, formatMoney, formatMonths } from '../../utils/format.js'
+import { formatDate, formatMoney, formatMonth, formatMonths } from '../../utils/format.js'
 
 export default function ResultsSection({ debts = [], strategies = [], selectedStrategy = null, onSelectType }) {
+  const [scheduleOpen, setScheduleOpen] = useState(false)
+
+  useEffect(() => {
+    setScheduleOpen(window.matchMedia('(min-width: 768px)').matches)
+  }, [])
+
   const hasCards = Array.isArray(strategies) && strategies.length > 0
   const hasSelected = hasCards && selectedStrategy !== null && selectedStrategy !== undefined
+  const nameById = new Map(debts.map((debt) => [debt.id, debt.name]))
   const closureItems = hasSelected && !selectedStrategy.isEmpty
     ? buildClosureList(debts, selectedStrategy)
     : []
+  const hasSchedule = hasSelected && !selectedStrategy.stalled && Array.isArray(selectedStrategy.schedule)
+    && selectedStrategy.schedule.length > 0
 
   return (
     <Section
@@ -96,6 +106,42 @@ export default function ResultsSection({ debts = [], strategies = [], selectedSt
                     ))}
                   </ol>
                 </div>
+
+                {hasSchedule ? (
+                  <details className="schedule-block" open={scheduleOpen}>
+                    <summary className="schedule-block__summary">
+                      График платежей ({formatMonths(selectedStrategy.months)})
+                    </summary>
+                    <div className="table-scroll schedule-scroll">
+                      <table className="schedule-table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Месяц</th>
+                            <th scope="col">Долг</th>
+                            <th scope="col" className="num">Платёж</th>
+                            <th scope="col" className="num">Проценты</th>
+                            <th scope="col" className="num">Тело</th>
+                            <th scope="col" className="num">Остаток</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedStrategy.schedule.flatMap((entry) =>
+                            entry.rows.map((row) => (
+                              <tr key={`${entry.monthIso}-${row.debtId}`}>
+                                <td data-label="Месяц">{formatMonth(entry.monthIso)}</td>
+                                <td data-label="Долг">{nameById.get(row.debtId) ?? '—'}</td>
+                                <td className="num" data-label="Платёж">{formatMoney(row.payment)}</td>
+                                <td className="num" data-label="Проценты">{formatMoney(row.interest)}</td>
+                                <td className="num" data-label="Тело">{formatMoney(row.principal)}</td>
+                                <td className="num" data-label="Остаток">{formatMoney(row.endBalance)}</td>
+                              </tr>
+                            )),
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </details>
+                ) : null}
               </div>
             )
           ) : null}

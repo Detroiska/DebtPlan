@@ -59,3 +59,13 @@ export function formatMonths(months) {
 
   return parts.length > 0 ? parts.join(' ') : '—'
 }
+
+export function formatMonth(yearMonthIso) {
+  if (typeof yearMonthIso !== 'string' || yearMonthIso === '') return '—'
+  const date = new Date(`${yearMonthIso}-01T00:00:00`)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleDateString('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+  })
+}
