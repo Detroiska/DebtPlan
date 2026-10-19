@@ -157,6 +157,8 @@ export default function ResultsSection({ debts = [], strategies = [], selectedSt
           <span>Добавьте долг — расчёт стратегий выполнится автоматически.</span>
         </div>
       )}
+
+      {hasCards ? <p className="disclaimer">Расчёт носит справочный характер и не является финансовой рекомендацией.</p> : null}
     </Section>
   )
 }
