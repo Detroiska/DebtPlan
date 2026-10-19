@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react'
 import Section from '../../components/Section.jsx'
+import CustomOrderBlock from './CustomOrderBlock.jsx'
 import { buildClosureList } from '../../utils/payoff.js'
 import { formatDate, formatMoney, formatMonth, formatMonths } from '../../utils/format.js'
 
-export default function ResultsSection({ debts = [], strategies = [], selectedStrategy = null, isRecalculating = false, onSelectType }) {
+export default function ResultsSection({
+  debts = [],
+  strategies = [],
+  selectedStrategy = null,
+  isRecalculating = false,
+  customOrder = null,
+  onMoveCustomOrder,
+  onResetCustomOrder,
+  onSelectType,
+}) {
   const [scheduleOpen, setScheduleOpen] = useState(false)
 
   useEffect(() => {
@@ -12,6 +22,7 @@ export default function ResultsSection({ debts = [], strategies = [], selectedSt
 
   const hasCards = Array.isArray(strategies) && strategies.length > 0
   const hasSelected = hasCards && selectedStrategy !== null && selectedStrategy !== undefined
+  const hasCustom = Array.isArray(customOrder) && customOrder.length > 0
   const nameById = new Map(debts.map((debt) => [debt.id, debt.name]))
   const closureItems = hasSelected && !selectedStrategy.isEmpty
     ? buildClosureList(debts, selectedStrategy)
@@ -75,6 +86,14 @@ export default function ResultsSection({ debts = [], strategies = [], selectedSt
               )
             })}
           </ul>
+
+          <CustomOrderBlock
+            debts={debts}
+            customOrder={customOrder}
+            hasCustom={hasCustom}
+            onMove={onMoveCustomOrder}
+            onReset={onResetCustomOrder}
+          />
 
           {hasSelected ? (
             selectedStrategy.stalled ? (

@@ -624,6 +624,55 @@
   color: var(--color-text-muted);
 }
 
+.custom-order-block {
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.custom-order-block__summary {
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+
+.custom-order-block .custom-order__list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: custom-order;
+}
+
+.custom-order__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.custom-order__item::before {
+  counter-increment: custom-order;
+  content: counter(custom-order) '.';
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.custom-order__name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.custom-order__actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.custom-order__reset {
+  margin-top: 10px;
+}
+
 @media (min-width: 768px) and (max-width: 1023px) {
   .app-header__inner {
     padding: 24px 20px;
