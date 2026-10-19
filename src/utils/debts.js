@@ -6,6 +6,18 @@ export const DEBT_TYPES = Object.freeze([
 ])
 
 const DEBT_TYPE_VALUES = DEBT_TYPES.map((type) => type.value)
+const DEBT_TYPE_LABELS = new Map(DEBT_TYPES.map((type) => [type.value, type.label]))
+
+export function getDebtTypeLabel(type) {
+  return DEBT_TYPE_LABELS.get(type) ?? 'Кредит'
+}
+
+export function getDebtLabel(debt) {
+  if (typeof debt?.name === 'string' && debt.name.trim() !== '') {
+    return debt.name.trim()
+  }
+  return getDebtTypeLabel(debt?.type)
+}
 
 export const DEBT_FIELDS = Object.freeze(['id', 'name', 'type', 'balance', 'apr', 'minPayment'])
 
