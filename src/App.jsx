@@ -8,7 +8,7 @@ import ResultsSection from './features/results/ResultsSection.jsx'
 import './App.css'
 
 export default function App() {
-  const { debts } = useDebts()
+  const { debts, addDebt } = useDebts()
 
   return (
     <div className="app">
@@ -16,7 +16,7 @@ export default function App() {
 
       <main className="app-main">
         <div className="app-main__inner">
-          <DebtsSection debts={debts} />
+          <DebtsSection debts={debts} onAddDebt={addDebt} />
           <CalcParamsSection />
           <ResultsSection />
           <MethodologySection />
