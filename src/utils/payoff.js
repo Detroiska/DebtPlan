@@ -40,7 +40,7 @@ function monthIso({ y, m }, monthIndex) {
   return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}`
 }
 
-function buildOrderIds(order, list) {
+export function buildOrderIds(order, list) {
   const known = new Set(list.map((debt) => debt.id))
   const result = []
 
@@ -59,7 +59,7 @@ function buildOrderIds(order, list) {
   return result
 }
 
-export function calculatePayoff(debts, params, order) {
+export function calculatePayoff(debts, params, order, options = {}) {
   const list = normalizeDebtList(debts)
 
   if (list.length === 0) {
@@ -69,6 +69,10 @@ export function calculatePayoff(debts, params, order) {
   const freeAmount = Math.max(0, parseNumber(params?.freeAmount) ?? 0)
   const minimumsTotal = round2(
     list.reduce((sum, debt) => sum + Math.max(0, parseNumber(debt.minPayment) ?? 0), 0),
+  )
+
+  const extraExemptIds = new Set(
+    Array.isArray(options.extraExemptIds) ? options.extraExemptIds : [],
   )
 
   const balances = new Map()
@@ -133,6 +137,8 @@ export function calculatePayoff(debts, params, order) {
     for (const row of rows) {
       if (budget <= 0) break
       const id = row.debtId
+      if (extraExemptIds.has(id)) continue
+
       const balance = balances.get(id)
       if (balance <= 0) continue
 
