@@ -196,6 +196,11 @@
   background-color: var(--color-page);
 }
 
+.btn--small {
+  padding: 6px 10px;
+  font-size: 0.8125rem;
+}
+
 .btn:focus-visible,
 .form-input:focus-visible {
   outline: 2px solid var(--color-accent);

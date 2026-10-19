@@ -8,6 +8,8 @@ export const DEBT_TYPES = Object.freeze([
 const DEBT_TYPE_VALUES = DEBT_TYPES.map((type) => type.value)
 const DEBT_TYPE_LABELS = new Map(DEBT_TYPES.map((type) => [type.value, type.label]))
 
+const EMPTY_DEBT_FORM = Object.freeze({ type: 'credit', name: '', balance: '', apr: '', minPayment: '' })
+
 export function getDebtTypeLabel(type) {
   return DEBT_TYPE_LABELS.get(type) ?? 'Кредит'
 }
@@ -93,6 +95,17 @@ export function createDebt(input) {
     throw new Error('Некорректные данные долга')
   }
   return debt
+}
+
+export function debtToFormValues(debt) {
+  if (typeof debt !== 'object' || debt === null) return { ...EMPTY_DEBT_FORM }
+  return {
+    type: DEBT_TYPE_VALUES.includes(debt.type) ? debt.type : 'credit',
+    name: typeof debt.name === 'string' ? debt.name : '',
+    balance: String(debt.balance ?? ''),
+    apr: String(debt.apr ?? ''),
+    minPayment: String(debt.minPayment ?? ''),
+  }
 }
 
 export function isValidDebt(value) {
