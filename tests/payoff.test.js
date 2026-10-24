@@ -247,6 +247,21 @@ describe('стратегии (FE-013/FE-020)', () => {
     expect(avalancheNoRf.schedule[0].rows[0].endBalance).toBe(11080)
   })
 
+  it('безрисковая ставка применяется ко всем стратегиям', () => {
+    const debts = [
+      debt('cheap', { balance: 1000, apr: 5, minPayment: 100 }),
+      debt('expensive', { balance: 5000, apr: 30, minPayment: 100 }),
+    ]
+    const list = calculateStrategies(debts, paramsRf(1000, 12), ['cheap', 'expensive'])
+
+    for (const type of ['avalanche', 'snowball', 'custom']) {
+      const strategy = list.find((item) => item.type === type)
+      const firstMonth = strategy.schedule[0].rows
+      expect(firstMonth.find((row) => row.debtId === 'cheap').payment).toBe(100)
+      expect(firstMonth.find((row) => row.debtId === 'expensive').payment).toBe(900)
+    }
+  })
+
   it('все stalled -> оптимального нет', () => {
     const debts = [
       debt('a', { balance: 5000, apr: 24, minPayment: 2000 }),

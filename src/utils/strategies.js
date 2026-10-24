@@ -76,21 +76,22 @@ export function calculateStrategies(debts, params, customOrder = null) {
   const extraExemptIds = hasRiskFree
     ? list.filter((debt) => debt.apr < riskFreeRate).map((debt) => debt.id)
     : []
+  const exemptOptions = extraExemptIds.length > 0 ? { extraExemptIds } : {}
 
   const entries = [
     {
       type: 'avalanche',
       order: avalancheOrder,
-      options: extraExemptIds.length > 0 ? { extraExemptIds } : {},
+      options: exemptOptions,
     },
-    { type: 'snowball', order: buildStrategyOrder('snowball', list), options: {} },
+    { type: 'snowball', order: buildStrategyOrder('snowball', list), options: exemptOptions },
   ]
 
   if (Array.isArray(customOrder) && customOrder.length > 0) {
     entries.push({
       type: 'custom',
       order: buildOrderIds(customOrder, list),
-      options: {},
+      options: exemptOptions,
     })
   }
 
