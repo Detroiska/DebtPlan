@@ -1,8 +1,13 @@
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import AppFooter from './components/AppFooter.jsx'
 import AppHeader from './components/AppHeader.jsx'
 import { useCalcParams } from './hooks/useCalcParams.js'
 import { useDebts } from './hooks/useDebts.js'
+import {
+  getEffectiveCustomOrder,
+  loadCustomOrder,
+  saveCustomOrder,
+} from './utils/customOrder.js'
 import { buildOrderIds } from './utils/payoff.js'
 import { calculateStrategies, pickSelectedStrategy } from './utils/strategies.js'
 import CalcParamsSection from './features/calc/CalcParamsSection.jsx'
@@ -18,12 +23,21 @@ export default function App() {
   const deferredDebts = useDeferredValue(debts)
   const deferredParams = useDeferredValue(params)
 
-  const [customOrder, setCustomOrder] = useState(null)
+  const [customOrder, setCustomOrder] = useState(loadCustomOrder)
   const [selectedStrategyType, setSelectedStrategyType] = useState(null)
 
+  const effectiveCustomOrder = useMemo(
+    () => getEffectiveCustomOrder(customOrder, deferredDebts),
+    [customOrder, deferredDebts],
+  )
+
+  useEffect(() => {
+    saveCustomOrder(effectiveCustomOrder)
+  }, [effectiveCustomOrder])
+
   const strategies = useMemo(
-    () => calculateStrategies(deferredDebts, deferredParams, customOrder),
-    [deferredDebts, deferredParams, customOrder],
+    () => calculateStrategies(deferredDebts, deferredParams, effectiveCustomOrder),
+    [deferredDebts, deferredParams, effectiveCustomOrder],
   )
   const isRecalculating = deferredDebts !== debts || deferredParams !== params
 
@@ -65,7 +79,7 @@ export default function App() {
             strategies={strategies}
             selectedStrategy={selectedStrategy}
             isRecalculating={isRecalculating}
-            customOrder={customOrder}
+            customOrder={effectiveCustomOrder}
             onMoveCustomOrder={moveCustomOrder}
             onResetCustomOrder={resetCustomOrder}
             onSelectType={setSelectedStrategyType}
