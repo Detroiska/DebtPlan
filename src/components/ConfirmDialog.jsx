@@ -11,8 +11,9 @@ export default function ConfirmDialog({
   onCancel,
 }) {
   const cancelRef = useRef(null)
+  const dialogRef = useRef(null)
 
-  useModalDialog(isOpen, onCancel)
+  useModalDialog(isOpen, onCancel, dialogRef)
 
   useEffect(() => {
     if (!isOpen) return
@@ -33,11 +34,13 @@ export default function ConfirmDialog({
   return (
     <div className="modal-overlay" onMouseDown={handleOverlayMouseDown}>
       <div
+        ref={dialogRef}
         className="modal modal--confirm"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby="confirm-message"
+        tabIndex={-1}
       >
         <h3 className="modal__title" id="confirm-title">
           {title}

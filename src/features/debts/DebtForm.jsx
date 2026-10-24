@@ -32,11 +32,12 @@ export default function DebtForm({
   const [errors, setErrors] = useState({})
   const [error, setError] = useState('')
   const firstFieldRef = useRef(null)
+  const dialogRef = useRef(null)
   const initialValuesRef = useRef(initialValues)
 
   initialValuesRef.current = initialValues
 
-  useModalDialog(isOpen, onClose)
+  useModalDialog(isOpen, onClose, dialogRef)
 
   useEffect(() => {
     if (!isOpen) return
@@ -99,11 +100,13 @@ export default function DebtForm({
   return (
     <div className="modal-overlay" onMouseDown={handleOverlayMouseDown}>
       <div
+        ref={dialogRef}
         className="modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="debt-form-title"
         aria-describedby={error ? 'debt-form-error' : undefined}
+        tabIndex={-1}
       >
         <h3 className="modal__title" id="debt-form-title">
           {title}
