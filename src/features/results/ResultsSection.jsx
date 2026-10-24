@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Section from '../../components/Section.jsx'
 import CustomOrderBlock from './CustomOrderBlock.jsx'
 import { buildClosureList } from '../../utils/payoff.js'
+import { getDebtLabel } from '../../utils/debts.js'
 import { formatDate, formatMoney, formatMonth, formatMonths } from '../../utils/format.js'
 
 export default function ResultsSection({
@@ -23,7 +24,7 @@ export default function ResultsSection({
   const hasCards = Array.isArray(strategies) && strategies.length > 0
   const hasSelected = hasCards && selectedStrategy !== null && selectedStrategy !== undefined
   const hasCustom = Array.isArray(customOrder) && customOrder.length > 0
-  const nameById = new Map(debts.map((debt) => [debt.id, debt.name]))
+  const labelById = new Map(debts.map((debt) => [debt.id, getDebtLabel(debt)]))
   const closureItems = hasSelected && !selectedStrategy.isEmpty
     ? buildClosureList(debts, selectedStrategy)
     : []
@@ -153,7 +154,7 @@ export default function ResultsSection({
                             entry.rows.map((row) => (
                               <tr key={`${entry.monthIso}-${row.debtId}`}>
                                 <td data-label="Месяц">{formatMonth(entry.monthIso)}</td>
-                                <td data-label="Долг">{nameById.get(row.debtId) ?? '—'}</td>
+                                <td data-label="Долг">{labelById.get(row.debtId) ?? '—'}</td>
                                 <td className="num" data-label="Платёж">{formatMoney(row.payment)}</td>
                                 <td className="num" data-label="Проценты">{formatMoney(row.interest)}</td>
                                 <td className="num" data-label="Тело">{formatMoney(row.principal)}</td>

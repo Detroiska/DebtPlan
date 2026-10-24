@@ -199,6 +199,15 @@ describe('buildClosureList', () => {
     const fake = { isEmpty: false, closedOrder: ['ghost', 'b'], schedule: r.schedule }
     expect(buildClosureList(debts, fake).map((item) => item.id)).toEqual(['b'])
   })
+
+  it('для долга без названия подставляет название типа', () => {
+    const unnamed = debt('u', { balance: 1000, apr: 0, minPayment: 1000 })
+    const r = calculatePayoff([unnamed], params(1000), ['u'])
+
+    expect(buildClosureList([unnamed], r)).toEqual([
+      { id: 'u', name: 'Кредит', type: 'credit', closedAtIso: '2026-01' },
+    ])
+  })
 })
 
 describe('стратегии (FE-013/FE-020)', () => {

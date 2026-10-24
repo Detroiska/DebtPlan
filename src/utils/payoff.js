@@ -1,4 +1,4 @@
-import { normalizeDebtList, parseNumber } from './debts.js'
+import { getDebtLabel, normalizeDebtList, parseNumber } from './debts.js'
 
 const MAX_MONTHS = 600
 
@@ -252,7 +252,7 @@ export function buildClosureList(debts, result) {
     if (!debt) continue
     closure.push({
       id,
-      name: debt.name,
+      name: getDebtLabel(debt),
       type: debt.type,
       closedAtIso: closedMonthIso.get(id) ?? null,
     })
