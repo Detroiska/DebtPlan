@@ -74,6 +74,20 @@ describe('FE-007: валидация формы добавления долга'
     })
   })
 
+  it('не принимает остаток и минимальный платёж меньше 0,01', async () => {
+    const user = userEvent.setup()
+    const { onSubmit } = await renderDebtForm()
+
+    await user.type(screen.getByLabelText('Остаток долга, ₽'), '0.001')
+    await user.type(screen.getByLabelText('Годовая ставка, %'), '10')
+    await user.type(screen.getByLabelText('Минимальный платёж, ₽'), '0.001')
+    await user.click(screen.getByRole('button', { name: 'Сохранить' }))
+
+    expect(screen.getByText('Остаток долга должен быть не меньше 0,01 ₽')).toBeInTheDocument()
+    expect(screen.getByText('Минимальный платёж должен быть не меньше 0,01 ₽')).toBeInTheDocument()
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
   it('убирает сообщение об ошибке после исправления поля', async () => {
     const user = userEvent.setup()
     await renderDebtForm()

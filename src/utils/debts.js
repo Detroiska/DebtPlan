@@ -8,6 +8,8 @@ export const DEBT_TYPES = Object.freeze([
 const DEBT_TYPE_VALUES = DEBT_TYPES.map((type) => type.value)
 const DEBT_TYPE_LABELS = new Map(DEBT_TYPES.map((type) => [type.value, type.label]))
 
+export const MIN_DEBT_AMOUNT = 0.01
+
 const EMPTY_DEBT_FORM = Object.freeze({ type: 'credit', name: '', balance: '', apr: '', minPayment: '' })
 
 export function getDebtTypeLabel(type) {
@@ -73,9 +75,9 @@ export function normalizeDebt(input) {
   const apr = parseNonNegativeNumber(input.apr)
   const minPayment = parseNonNegativeNumber(input.minPayment)
 
-  if (balance === null || balance <= 0) return null
+  if (balance === null || balance < MIN_DEBT_AMOUNT) return null
   if (apr === null || apr > 100) return null
-  if (minPayment === null || minPayment <= 0) return null
+  if (minPayment === null || minPayment < MIN_DEBT_AMOUNT) return null
 
   const rawId = typeof input.id === 'string' ? input.id.trim() : ''
 

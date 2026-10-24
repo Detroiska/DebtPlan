@@ -1,4 +1,4 @@
-import { parseNumber } from './debts.js'
+import { MIN_DEBT_AMOUNT, parseNumber } from './debts.js'
 
 const isBlank = (value) => typeof value !== 'string' || value.trim() === ''
 
@@ -36,6 +36,7 @@ export function validateDebtForm(values) {
     const balance = parseNumber(values.balance)
     if (balance === null) errors.balance = 'Введите корректное число'
     else if (balance <= 0) errors.balance = 'Остаток долга должен быть больше 0'
+    else if (balance < MIN_DEBT_AMOUNT) errors.balance = 'Остаток долга должен быть не меньше 0,01 ₽'
   }
 
   if (isBlank(values.apr)) {
@@ -52,6 +53,9 @@ export function validateDebtForm(values) {
     const minPayment = parseNumber(values.minPayment)
     if (minPayment === null) errors.minPayment = 'Введите корректное число'
     else if (minPayment <= 0) errors.minPayment = 'Минимальный платёж должен быть больше 0'
+    else if (minPayment < MIN_DEBT_AMOUNT) {
+      errors.minPayment = 'Минимальный платёж должен быть не меньше 0,01 ₽'
+    }
   }
 
   return errors

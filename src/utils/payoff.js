@@ -11,10 +11,11 @@ const EMPTY_RESULT = Object.freeze({
   totalPayment: 0,
   freeAmount: 0,
   minimumsTotal: 0,
-  schedule: [],
-  closedOrder: [],
-  order: [],
+  schedule: Object.freeze([]),
+  closedOrder: Object.freeze([]),
+  order: Object.freeze([]),
   stalled: false,
+  limitReached: false,
 })
 
 function round2(value) {
@@ -59,6 +60,17 @@ export function buildOrderIds(order, list) {
   return result
 }
 
+function createClosedResult({ startMonthIso, freeAmount, minimumsTotal, order }) {
+  return {
+    ...EMPTY_RESULT,
+    isEmpty: false,
+    startMonthIso,
+    freeAmount,
+    minimumsTotal,
+    order,
+  }
+}
+
 export function calculatePayoff(debts, params, order, options = {}) {
   const list = normalizeDebtList(debts)
 
@@ -66,13 +78,14 @@ export function calculatePayoff(debts, params, order, options = {}) {
     return { ...EMPTY_RESULT }
   }
 
+  const opts = options ?? {}
   const freeAmount = Math.max(0, parseNumber(params?.freeAmount) ?? 0)
   const minimumsTotal = round2(
     list.reduce((sum, debt) => sum + Math.max(0, parseNumber(debt.minPayment) ?? 0), 0),
   )
 
   const extraExemptIds = new Set(
-    Array.isArray(options.extraExemptIds) ? options.extraExemptIds : [],
+    Array.isArray(opts.extraExemptIds) ? opts.extraExemptIds : [],
   )
 
   const balances = new Map()
@@ -87,6 +100,10 @@ export function calculatePayoff(debts, params, order, options = {}) {
   const effectiveOrder = buildOrderIds(order, list)
   const startMonth = parseMonthParts(params?.startDate)
   const startMonthIso = monthIso({ y: startMonth.y, m: startMonth.m }, 1)
+
+  if (!effectiveOrder.some((id) => balances.get(id) > 0)) {
+    return createClosedResult({ startMonthIso, freeAmount, minimumsTotal, order: effectiveOrder })
+  }
 
   const schedule = []
   const closedOrder = []
@@ -187,6 +204,10 @@ export function calculatePayoff(debts, params, order, options = {}) {
       order: effectiveOrder,
       stalled: true,
     }
+  }
+
+  if (schedule.length === 0) {
+    return createClosedResult({ startMonthIso, freeAmount, minimumsTotal, order: effectiveOrder })
   }
 
   const lastMonth = schedule[schedule.length - 1]

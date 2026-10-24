@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { calculatePayoff, buildClosureList } from '../src/utils/payoff.js'
+import { normalizeDebt } from '../src/utils/debts.js'
 import {
   calculateStrategies,
   buildStrategyOrder,
@@ -128,6 +129,27 @@ describe('calculatePayoff: несколько долгов', () => {
       expect(r.totalInterest).toBe(0)
       expect(r.stalled).toBe(false)
     }
+  })
+})
+
+describe('минимально допустимые суммы', () => {
+  it('остаток и минимальный платёж меньше 0,01 отбрасываются при нормализации', () => {
+    expect(
+      normalizeDebt({ id: 'a', name: '', type: 'credit', balance: 0.001, apr: 10, minPayment: 100 }),
+    ).toBeNull()
+    expect(
+      normalizeDebt({ id: 'a', name: '', type: 'credit', balance: 1000, apr: 10, minPayment: 0.001 }),
+    ).toBeNull()
+  })
+
+  it('слишком маленький остаток не роняет расчёт', () => {
+    expect(() =>
+      calculatePayoff(
+        [debt('a', { balance: 0.001, apr: 10, minPayment: 100 })],
+        params(1000),
+        ['a'],
+      ),
+    ).not.toThrow()
   })
 })
 
