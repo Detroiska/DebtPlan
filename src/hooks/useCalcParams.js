@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { loadCalcParams, saveCalcParams } from '../utils/calcParams.js'
+import {
+  DEFAULT_CALC_PARAMS,
+  loadCalcParams,
+  saveCalcParams,
+} from '../utils/calcParams.js'
 
 export function useCalcParams() {
   const [params, setParams] = useState(loadCalcParams)
@@ -13,7 +17,7 @@ export function useCalcParams() {
   }, [])
 
   const resetParams = useCallback(() => {
-    setParams(loadCalcParams())
+    setParams({ ...DEFAULT_CALC_PARAMS })
   }, [])
 
   return { params, setParam, setParams, resetParams }
