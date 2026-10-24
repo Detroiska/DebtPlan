@@ -47,6 +47,7 @@ export default function ResultsSection({
           <ul className="strategy-list">
             {strategies.map((strategy) => {
               const selected = selectedStrategy?.type === strategy.type
+              const incomplete = strategy.stalled || strategy.limitReached
 
               return (
                 <li key={strategy.type}>
@@ -60,24 +61,27 @@ export default function ResultsSection({
                       <span className="strategy-card__title">{strategy.title}</span>
                       {strategy.isOptimal ? <span className="badge badge--optimal">Оптимальная</span> : null}
                       {strategy.stalled ? <span className="badge badge--warning">Платежей не хватает</span> : null}
+                      {strategy.limitReached && !strategy.stalled ? (
+                        <span className="badge badge--warning">Срок больше 50 лет</span>
+                      ) : null}
                     </span>
                     <span className="strategy-card__metrics">
                       <span className="strategy-card__metric">
                         <span className="strategy-card__metric-label">Срок</span>
                         <span className="strategy-card__metric-value">
-                          {strategy.stalled ? '—' : formatMonths(strategy.months)}
+                          {incomplete ? '—' : formatMonths(strategy.months)}
                         </span>
                       </span>
                       <span className="strategy-card__metric">
                         <span className="strategy-card__metric-label">Дата погашения</span>
                         <span className="strategy-card__metric-value">
-                          {strategy.stalled ? '—' : formatDate(strategy.payoffDate)}
+                          {incomplete ? '—' : formatDate(strategy.payoffDate)}
                         </span>
                       </span>
                       <span className="strategy-card__metric">
                         <span className="strategy-card__metric-label">Переплата</span>
                         <span className="strategy-card__metric-value">
-                          {strategy.stalled ? '—' : formatMoney(strategy.totalInterest)}
+                          {incomplete ? '—' : formatMoney(strategy.totalInterest)}
                         </span>
                       </span>
                     </span>
@@ -100,6 +104,11 @@ export default function ResultsSection({
             selectedStrategy.stalled ? (
               <p className="form-warning">
                 При минимальных платежах проценты превышают платежи — долги не закроются. Увеличьте свободную сумму.
+              </p>
+            ) : selectedStrategy.limitReached ? (
+              <p className="form-warning">
+                Расчёт ограничен 50 годами: за этот срок долги не успевают закрыться. Увеличьте свободную
+                сумму или проверьте минимальные платежи.
               </p>
             ) : (
               <div className="payoff-details">

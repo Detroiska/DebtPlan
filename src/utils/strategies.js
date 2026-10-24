@@ -46,7 +46,7 @@ export function pickOptimalStrategy(results) {
   let best = null
 
   for (const result of results) {
-    if (!result || result.isEmpty || result.stalled || result.months === null) continue
+    if (!result || result.isEmpty || result.stalled || result.limitReached || result.months === null) continue
 
     if (best === null) {
       best = result

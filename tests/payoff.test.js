@@ -166,6 +166,17 @@ describe('недостаточная свободная сумма', () => {
     expect(r.schedule).toEqual([])
     expect(Number.isFinite(r.totalInterest)).toBe(true)
   })
+
+  it('превышен лимит 600 месяцев -> limitReached, но не stalled', () => {
+    const debts = [debt('m', { balance: 5_000_000, apr: 10, minPayment: 41_700 })]
+    const r = calculatePayoff(debts, params(41_700), ['m'])
+
+    expect(r.limitReached).toBe(true)
+    expect(r.stalled).toBe(false)
+    expect(r.months).toBeNull()
+    expect(r.payoffDate).toBeNull()
+    expect(r.schedule).toEqual([])
+  })
 })
 
 describe('даты погашения', () => {
@@ -295,5 +306,14 @@ describe('стратегии (FE-013/FE-020)', () => {
     const stalled = { isEmpty: false, stalled: true, months: null, totalInterest: 5 }
     const normal = { isEmpty: false, stalled: false, months: 5, totalInterest: 999 }
     expect(pickOptimalStrategy([stalled, normal])).toBe(normal)
+
+    const limitReached = {
+      isEmpty: false,
+      stalled: false,
+      limitReached: true,
+      months: null,
+      totalInterest: 1,
+    }
+    expect(pickOptimalStrategy([limitReached, normal])).toBe(normal)
   })
 })

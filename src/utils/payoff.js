@@ -187,9 +187,15 @@ export function calculatePayoff(debts, params, order, options = {}) {
     totalPayment = round2(totalPayment + schedule[schedule.length - 1].payment)
   }
 
-  const stalled = [...balances.values()].some((balance) => balance > 0)
+  const hasOpenBalance = [...balances.values()].some((balance) => balance > 0)
+  const lastEntry = schedule[schedule.length - 1]
+  const isProgressing = lastEntry
+    ? lastEntry.rows.some((row) => row.endBalance < row.startBalance)
+    : false
+  const limitReached = hasOpenBalance
+  const stalled = hasOpenBalance && !isProgressing
 
-  if (stalled) {
+  if (hasOpenBalance) {
     return {
       isEmpty: false,
       months: null,
@@ -202,7 +208,8 @@ export function calculatePayoff(debts, params, order, options = {}) {
       schedule: [],
       closedOrder,
       order: effectiveOrder,
-      stalled: true,
+      stalled,
+      limitReached,
     }
   }
 
@@ -225,6 +232,7 @@ export function calculatePayoff(debts, params, order, options = {}) {
     closedOrder,
     order: effectiveOrder,
     stalled: false,
+    limitReached: false,
   }
 }
 
