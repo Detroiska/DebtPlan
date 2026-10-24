@@ -1,5 +1,6 @@
 import { normalizeDebtList, parseNumber } from './debts.js'
-import { calculatePayoff, buildOrderIds } from './payoff.js'
+import { getEffectiveCustomOrder } from './customOrder.js'
+import { calculatePayoff } from './payoff.js'
 
 export const STRATEGY_META = Object.freeze({
   avalanche: {
@@ -87,10 +88,11 @@ export function calculateStrategies(debts, params, customOrder = null) {
     { type: 'snowball', order: buildStrategyOrder('snowball', list), options: exemptOptions },
   ]
 
-  if (Array.isArray(customOrder) && customOrder.length > 0) {
+  const effectiveCustomOrder = getEffectiveCustomOrder(customOrder, list)
+  if (effectiveCustomOrder) {
     entries.push({
       type: 'custom',
-      order: buildOrderIds(customOrder, list),
+      order: effectiveCustomOrder,
       options: exemptOptions,
     })
   }

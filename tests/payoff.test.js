@@ -283,6 +283,16 @@ describe('стратегии (FE-013/FE-020)', () => {
     expect(list.every((s) => s.stalled && !s.isOptimal)).toBe(true)
   })
 
+  it('устаревший customOrder не создаёт свою стратегию', () => {
+    const debts = [
+      debt('a', { balance: 1000, apr: 24, minPayment: 500 }),
+      debt('b', { balance: 1000, apr: 12, minPayment: 500 }),
+    ]
+    const list = calculateStrategies(debts, params(1050), ['ghost'])
+
+    expect(list.map((strategy) => strategy.type)).toEqual(['avalanche', 'snowball'])
+  })
+
   it('своя стратегия входит в сравнение и сбрасывается в оптимальную', () => {
     const debts = [
       debt('a', { balance: 1000, apr: 24, minPayment: 500 }),

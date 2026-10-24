@@ -93,7 +93,7 @@ npm run test:watch
 
 ```text
 Test Files  11 passed (11)
-Tests       48 passed (48)
+Tests       49 passed (49)
 ```
 
 ### Настройка тестового окружения
