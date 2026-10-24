@@ -20,10 +20,22 @@ function parseIsoDate(value) {
   const trimmed = value.trim()
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null
 
+  const [year, month, day] = trimmed.split('-').map(Number)
   const date = new Date(`${trimmed}T00:00:00`)
-  if (Number.isNaN(date.getTime())) return null
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null
+  }
 
   return trimmed
+}
+
+export function isValidIsoDate(value) {
+  return parseIsoDate(value) !== null
 }
 
 export function normalizeCalcParams(raw) {

@@ -1,6 +1,7 @@
 import Section from '../../components/Section.jsx'
 import { todayIso, formatMoney } from '../../utils/format.js'
 import { parseNumber } from '../../utils/debts.js'
+import { isValidIsoDate } from '../../utils/calcParams.js'
 import { getFreeAmountWarning } from '../../utils/validation.js'
 
 export default function CalcParamsSection({ debts, params, onChange }) {
@@ -8,7 +9,8 @@ export default function CalcParamsSection({ debts, params, onChange }) {
   const warning = getFreeAmountWarning(debts, params.freeAmount)
 
   const handleFreeAmount = (event) => {
-    onChange('freeAmount', parseNumber(event.target.value) ?? 0)
+    const parsed = parseNumber(event.target.value)
+    onChange('freeAmount', parsed === null ? 0 : Math.max(0, parsed))
   }
 
   const handleRiskFreeRate = (event) => {
@@ -17,16 +19,17 @@ export default function CalcParamsSection({ debts, params, onChange }) {
       onChange('riskFreeRate', null)
       return
     }
-    onChange('riskFreeRate', parseNumber(raw) ?? null)
+    const parsed = parseNumber(raw)
+    if (parsed === null) {
+      onChange('riskFreeRate', null)
+      return
+    }
+    onChange('riskFreeRate', Math.min(100, Math.max(0, parsed)))
   }
 
   const handleStartDate = (event) => {
     const raw = event.target.value
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-      onChange('startDate', null)
-      return
-    }
-    onChange('startDate', raw)
+    onChange('startDate', isValidIsoDate(raw) ? raw : null)
   }
 
   return (
@@ -94,10 +97,10 @@ export default function CalcParamsSection({ debts, params, onChange }) {
 
         {warning ? (
           <p className="form-warning" role="alert">
-            <strong>Свободной суммы не хватает.</strong> Минимальные платежи по всем долгам
-            составляют {formatMoney(warning.minTotal)} в месяц, а указано{' '}
-            {formatMoney(warning.freeAmount)}. План получится неполным — увеличьте сумму хотя бы
-            до {formatMoney(warning.minTotal)}.
+            <strong>Свободной суммы меньше суммы минимальных платежей.</strong> По договорам
+            минимальные платежи составляют {formatMoney(warning.minTotal)} в месяц, а указано{' '}
+            {formatMoney(warning.freeAmount)}. В расчёте часть долгов получит меньше минимального
+            платежа — увеличьте сумму хотя бы до {formatMoney(warning.minTotal)}.
           </p>
         ) : null}
       </form>
